@@ -1,0 +1,12 @@
+.center {
+    display: grid;
+    place-items: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.gap {
+    gap: calc(1rem);
+}
