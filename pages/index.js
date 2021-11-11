@@ -1,10 +1,12 @@
 import Head from 'next/head'
 import styles from '../styles/index.module.css'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export default function Home() {
   const [users, setUsers] = useState([])
+  const [recommendations, setRecommendations] = useState([])
+  const userSelectRef = useRef();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -16,6 +18,18 @@ export default function Home() {
     fetchUsers()
   }, [])
 
+  const getRecommendations = async () => {
+    const res = await fetch('/api/recommendation', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user: userSelectRef.current.value })
+    })
+    const data = await res.json()
+    console.log(data)
+  }
+
   return (
     <div>
       <Head>
@@ -24,34 +38,28 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.center}>
-        <div className={`${styles.flex} ${styles.gap}`}>
-          <div>
-            <label for="user">{'User '}</label>
-            <select name="user" id="user">
-              {users.map(user =>
-                <option key={user.id} value={user.id}>
-                  {user.id + ": " + user.name}
-                </option>
-              )}
-            </select>
-          </div>
-          <div>
-            <label for="similarity">{'Similarity '}</label>
-            <select name="similarity" id="similarity">
-              <option value="euclidean">Euclidean</option>
-            </select>
-          </div>
-          <div>
-            <label for="results">{'Results '}</label>
-            <input type="text" id="results" />
-          </div>
-        </div>
-        <div className={`${styles.flex} ${styles.gap}`}>
-          <button>Find top matching users</button>
-          <button>Find recommended movies</button>
-          <button>Find recommendations, item-based</button>
-        </div>
+      <main className={styles.main}>
+        <section className={styles.section}>
+          <label htmlFor="user">{'User '}</label>
+          <select name="user" id="user" ref={userSelectRef}>
+            {users.map(user =>
+              <option key={user.id} value={user.id}>
+                {user.id + ": " + user.name}
+              </option>
+            )}
+          </select>
+          <label htmlFor="similarity">{'Similarity '}</label>
+          <select name="similarity" id="similarity">
+            <option value="euclidean">Euclidean</option>
+          </select>
+          <label htmlFor="results">{'Results '}</label>
+          <input type="text" id="results" />
+        </section>
+        <section className={styles.section}>
+          <button disabled>Find top matching users</button>
+          <button onClick={getRecommendations}>Find recommended movies</button>
+          <button disabled>Find recommendations, item-based</button>
+        </section>
       </main>
     </div>
   )
