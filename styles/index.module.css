@@ -1,12 +1,24 @@
-.center {
+.main {
     display: grid;
     place-items: center;
+    gap: 0.5rem;
+    padding: 1.5em 0;
 }
 
-.flex {
+.section {
     display: flex;
+    gap: 0.5rem;
 }
 
-.gap {
-    gap: calc(1rem);
+@media (max-width: 750px) {
+    .section {
+        flex-direction: column;
+        gap: unset;
+    }
+
+    .section > select,
+    .section > input,
+    .section > button {
+        margin-bottom: 0.5rem;
+    }
 }
