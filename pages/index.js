@@ -6,7 +6,8 @@ import { useEffect, useState, useRef } from 'react'
 export default function Home() {
   const [users, setUsers] = useState([])
   const [recommendations, setRecommendations] = useState([])
-  const userSelectRef = useRef();
+  const userRef = useRef();
+  const similarityRef = useRef();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -24,7 +25,10 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ user: userSelectRef.current.value })
+      body: JSON.stringify({
+        userId: userRef.current.value,
+        similarity: similarityRef.current.value
+      })
     })
     const data = await res.json()
     console.log(data)
@@ -41,7 +45,7 @@ export default function Home() {
       <main className={styles.main}>
         <section className={styles.section}>
           <label htmlFor="user">{'User '}</label>
-          <select name="user" id="user" ref={userSelectRef}>
+          <select name="user" id="user" ref={userRef}>
             {users.map(user =>
               <option key={user.id} value={user.id}>
                 {user.id + ": " + user.name}
@@ -49,8 +53,9 @@ export default function Home() {
             )}
           </select>
           <label htmlFor="similarity">{'Similarity '}</label>
-          <select name="similarity" id="similarity">
+          <select name="similarity" id="similarity" ref={similarityRef}>
             <option value="euclidean">Euclidean</option>
+            <option value="pearson">Pearson</option>
           </select>
           <label htmlFor="results">{'Results '}</label>
           <input type="text" id="results" />
