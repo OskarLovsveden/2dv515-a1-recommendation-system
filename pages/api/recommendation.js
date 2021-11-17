@@ -1,5 +1,5 @@
-import { euclidean, pearson } from '../utils/similarity'
-import { getRatings, getUsers } from '../utils/csv'
+import { euclidean, pearson } from 'utils/similarity'
+import { getRatings, getUsers } from 'utils/csv'
 
 export default async function userHandler(req, res) {
     const {
@@ -52,19 +52,19 @@ const getRecommendations = async (userId, similarity) => {
         }
     }
 
-    const weightedScores = []
+    // const weightedScores = []
 
-    for await (const user of userMatrix) {
-        if (user.similarity > 0) {
-            const ratings = getRatings(user.id)
+    // for await (const user of userMatrix) {
+    //     if (user.similarity > 0) {
+    //         const ratings = getRatings(user.id)
 
-            for await (const rating of ratings) {
-                if (weightedScores.some(w => w.id == rating.userId)) {
+    //         for await (const rating of ratings) {
+    //             if (weightedScores.some(w => w.id == rating.userId)) {
 
-                }
-            }
-        }
-    }
+    //             }
+    //         }
+    //     }
+    // }
 
     return userMatrix
 }

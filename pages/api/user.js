@@ -1,4 +1,4 @@
-import { getUsers } from '../utils/csv'
+import { getUsers } from 'utils/csv'
 
 export default async function handler(req, res) {
     try {
