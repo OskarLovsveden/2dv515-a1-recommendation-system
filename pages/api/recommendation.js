@@ -52,19 +52,32 @@ const getRecommendations = async (userId, similarity) => {
         }
     }
 
-    // const weightedScores = []
+    const recommendations = []
 
-    // for await (const user of userMatrix) {
-    //     if (user.similarity > 0) {
-    //         const ratings = getRatings(user.id)
+    for await (const user of userMatrix) {
+        if (user.similarity > 0) {
+            const ratings = await getRatings(user.id)
 
-    //         for await (const rating of ratings) {
-    //             if (weightedScores.some(w => w.id == rating.userId)) {
+            for await (const rating of ratings) {
+                const recommendation = recommendations.find(w => w.movieId == rating.movieId)
+                if (recommendation) {
+                    recommendation.sumWeight += rating.score * user.similarity
+                    recommendation.sumSim += user.similarity
+                } else {
+                    recommendations.push({
+                        movieId: rating.movieId, 
+                        sumWeight: rating.score * user.similarity,
+                        sumSim: user.similarity,
+                        score: 0
+                    })
+                }
+            }
+        }
+    }
+    
+    for await (const recommendation of recommendations) {
+        recommendation.score = recommendation.sumWeight / recommendation.sumSim
+    }
 
-    //             }
-    //         }
-    //     }
-    // }
-
-    return userMatrix
+    return recommendations.sort((a,b) => b.score - a.score)
 }
