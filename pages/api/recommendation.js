@@ -1,5 +1,5 @@
 import { euclidean, pearson } from '../utils/similarity'
-import { getUsers } from '../utils/csv'
+import { getRatings, getUsers } from '../utils/csv'
 
 export default async function userHandler(req, res) {
     const {
@@ -26,14 +26,24 @@ export default async function userHandler(req, res) {
 const getRecommendations = async (userId, similarity) => {
     const users = await getUsers();
 
+    const userMatrix = []
+
     for await (const user of users) {
         if (userId != user.id) {
             switch (similarity) {
                 case 'euclidean':
-                    console.log(user.name + ": " + await euclidean(userId, user.id))
+                    userMatrix.push({
+                        id: user.id,
+                        name: user.name,
+                        similarity: await euclidean(userId, user.id)
+                    })
                     break;
                 case 'pearson':
-                    console.log(user.name + ": " + await pearson(userId, user.id))
+                    userMatrix.push({
+                        id: user.id,
+                        name: user.name,
+                        similarity: await pearson(userId, user.id)
+                    })
                     break;
                 default:
                     console.log("Something went wrong...")
@@ -42,5 +52,19 @@ const getRecommendations = async (userId, similarity) => {
         }
     }
 
-    return users
+    const weightedScores = []
+
+    for await (const user of userMatrix) {
+        if (user.similarity > 0) {
+            const ratings = getRatings(user.id)
+
+            for await (const rating of ratings) {
+                if (weightedScores.some(w => w.id == rating.userId)) {
+
+                }
+            }
+        }
+    }
+
+    return userMatrix
 }
