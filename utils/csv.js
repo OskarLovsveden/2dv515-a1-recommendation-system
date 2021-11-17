@@ -1,10 +1,16 @@
 import fs from 'fs'
 import { parse } from 'csv'
 
+const exampleData = 'data/movies_example'
+const largeData = 'data/movies_example'
+const usersCsv = '/users.csv'
+const moviesCsv = '/movies.csv'
+const ratingsCsv = '/ratings.csv'
+
 const processFile = (path) => {
 
     const parser = fs
-        .createReadStream('./movies_example' + path)
+        .createReadStream(exampleData + path)
         .pipe(parse({
             from_line: 2,
             delimiter: ";"
@@ -15,7 +21,7 @@ const processFile = (path) => {
 
 const getUsers = async () => {
     const users = []
-    const parser = processFile('/users.csv');
+    const parser = processFile(usersCsv);
 
     for await (const record of parser) {
         users.push({
@@ -29,7 +35,7 @@ const getUsers = async () => {
 
 const getMovies = async () => {
     const movies = []
-    const parser = processFile('/movies.csv');
+    const parser = processFile(moviesCsv);
 
     for await (const record of parser) {
         movies.push({
@@ -44,7 +50,7 @@ const getMovies = async () => {
 
 const getRatings = async (userId) => {
     const ratings = []
-    const parser = processFile('/ratings.csv');
+    const parser = processFile(ratingsCsv);
 
     for await (const record of parser) {
         if (userId == parseInt(record[0])) {
