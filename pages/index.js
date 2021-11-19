@@ -6,8 +6,9 @@ import { useEffect, useState, useRef } from 'react'
 export default function Home() {
   const [users, setUsers] = useState([])
   const [recommendations, setRecommendations] = useState([])
-  const userRef = useRef();
-  const similarityRef = useRef();
+  const userRef = useRef()
+  const similarityTypeRef = useRef()
+  const resultLimitRef = useRef()
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -19,19 +20,28 @@ export default function Home() {
     fetchUsers()
   }, [])
 
-  const getRecommendations = async () => {
-    const res = await fetch('/api/recommendation', {
+  const onFindTopMatchingUsers = async () => {
+    await fetchRecommendations('/api/recommendation/user')
+  }
+
+  const onFindRecommendedMovies = async () => {
+    await fetchRecommendations('/api/recommendation/movie')
+  }
+
+  const fetchRecommendations = async (url) => {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         userId: userRef.current.value,
-        similarity: similarityRef.current.value
+        similarity: similarityTypeRef.current.value,
+        limit: resultLimitRef.current.value
       })
     })
-    const data = await res.json()
-    console.log(data)
+
+    setRecommendations(await res.json())
   }
 
   return (
@@ -53,18 +63,39 @@ export default function Home() {
             )}
           </select>
           <label htmlFor="similarity">{'Similarity '}</label>
-          <select name="similarity" id="similarity" ref={similarityRef}>
+          <select name="similarity" id="similarity" ref={similarityTypeRef}>
             <option value="euclidean">Euclidean</option>
             <option value="pearson">Pearson</option>
           </select>
           <label htmlFor="results">{'Results '}</label>
-          <input type="text" id="results" />
+          <input type="text" id="results" ref={resultLimitRef} />
         </section>
         <section className={styles.section}>
-          <button disabled>Find top matching users</button>
-          <button onClick={getRecommendations}>Find recommended movies</button>
+          <button onClick={onFindTopMatchingUsers}>Find top matching users</button>
+          <button onClick={onFindRecommendedMovies}>Find recommended movies</button>
           <button disabled>Find recommendations, item-based</button>
         </section>
+        {recommendations.length != 0 &&
+          <section>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>ID</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recommendations.map(r =>
+                  <tr key={r.movieID}>
+                    <td>{r.name}</td>
+                    <td>{r.id}</td>
+                    <td>{r.score.toFixed(4)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>}
       </main>
     </div>
   )
