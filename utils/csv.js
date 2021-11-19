@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { parse } from 'csv'
 
-const exampleData = 'data/movies_example'
-const largeData = 'data/movies_example'
+// const data = 'data/movies_example'
+const data = 'data/movies_large'
 const usersCsv = '/users.csv'
 const moviesCsv = '/movies.csv'
 const ratingsCsv = '/ratings.csv'
@@ -10,7 +10,7 @@ const ratingsCsv = '/ratings.csv'
 const processFile = (path) => {
 
     const parser = fs
-        .createReadStream(exampleData + path)
+        .createReadStream(data + path)
         .pipe(parse({
             from_line: 2,
             delimiter: ";"
@@ -21,7 +21,7 @@ const processFile = (path) => {
 
 const getUsers = async () => {
     const users = []
-    const parser = processFile(usersCsv);
+    const parser = processFile(usersCsv)
 
     for await (const record of parser) {
         users.push({
@@ -35,11 +35,11 @@ const getUsers = async () => {
 
 const getMovies = async () => {
     const movies = []
-    const parser = processFile(moviesCsv);
+    const parser = processFile(moviesCsv)
 
     for await (const record of parser) {
         movies.push({
-            movieId: parseInt(record[0]),
+            id: parseInt(record[0]),
             title: record[1],
             year: parseInt(record[2])
         })
@@ -48,9 +48,23 @@ const getMovies = async () => {
     return movies
 }
 
+const getMovie = async (id) => {
+    const parser = processFile(moviesCsv)
+
+    for await (const record of parser) {
+        if (id == parseInt(record[0])) {
+            return {
+                id: parseInt(record[0]),
+                title: record[1],
+                year: parseInt(record[2])
+            }
+        }
+    }
+}
+
 const getRatings = async (userId) => {
     const ratings = []
-    const parser = processFile(ratingsCsv);
+    const parser = processFile(ratingsCsv)
 
     for await (const record of parser) {
         if (userId == parseInt(record[0])) {
@@ -65,4 +79,4 @@ const getRatings = async (userId) => {
     return ratings
 }
 
-export { getUsers, getMovies, getRatings }
+export { getUsers, getMovies, getMovie, getRatings }
