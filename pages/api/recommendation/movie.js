@@ -7,8 +7,6 @@ export default async function userHandler(req, res) {
         method,
     } = req
 
-    console.log(limit ? limit : 500)
-
     switch (method) {
         case 'POST':
             try {
