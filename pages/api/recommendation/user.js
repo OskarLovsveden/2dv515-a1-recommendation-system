@@ -54,5 +54,5 @@ const findTopMatchingUsers = async (userId, simType) => {
         }
     }
 
-    return result
+    return result.sort((a, b) => b.score - a.score)
 }
